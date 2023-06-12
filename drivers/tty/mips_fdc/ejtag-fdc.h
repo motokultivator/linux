@@ -18,7 +18,6 @@
 #define REG_FDTX(N)	(0x20+0x8*(N))	/* FDC Transmit Register n (0..15) */
 
 /* Register fields */
-
 #define REG_FDCFG_TXINTTHRES_SHIFT	18
 #define REG_FDCFG_TXINTTHRES		(0x3 << REG_FDCFG_TXINTTHRES_SHIFT)
 #define REG_FDCFG_TXINTTHRES_DISABLED	(0x0 << REG_FDCFG_TXINTTHRES_SHIFT)
@@ -46,5 +45,11 @@
 #define REG_FDSTAT_RXF			BIT(2)	/* Rx Full */
 #define REG_FDSTAT_TXE			BIT(1)	/* Tx Empty */
 #define REG_FDSTAT_TXF			BIT(0)	/* Tx Full */
+
+void __iomem *get_fdc_regs(void);
+int is_fdc_interrupt(void);
+int mips_ejtag_fdc_tty_probe(struct mips_cdmm_device *dev);
+int mips_ejtag_fdc_tty_cpu_down(struct mips_cdmm_device *dev);
+int mips_ejtag_fdc_tty_cpu_up(struct mips_cdmm_device *dev);
 
 #endif /* __EJTAG_FDC_H */

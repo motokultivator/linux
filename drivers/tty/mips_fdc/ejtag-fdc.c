@@ -339,7 +339,7 @@ static int __init mips_ejtag_fdc_console_init(struct mips_ejtag_fdc_console *c)
 	if (c->initialised)
 		goto out;
 	/* Look for the FDC device */
-	regs = mips_cdmm_early_probe(0xfd);
+	regs = get_fdc_regs();
 	if (IS_ERR(regs)) {
 		ret = PTR_ERR(regs);
 		goto out;
@@ -628,7 +628,7 @@ static irqreturn_t mips_ejtag_fdc_isr(int irq, void *dev_id)
 		return IRQ_NONE;
 
 	/* If no FDC interrupt pending, it wasn't for us */
-	if (!(read_c0_cause() & CAUSEF_FDCI))
+	if (!is_fdc_interrupt())
 		return IRQ_NONE;
 
 	mips_ejtag_fdc_handle(priv);
@@ -846,7 +846,7 @@ int __weak get_c0_fdc_int(void)
 	return -1;
 }
 
-static int mips_ejtag_fdc_tty_probe(struct mips_cdmm_device *dev)
+int mips_ejtag_fdc_tty_probe(struct mips_cdmm_device *dev)
 {
 	int ret, nport;
 	struct mips_ejtag_fdc_tty_port *dport;
@@ -1009,7 +1009,7 @@ err_destroy_ports:
 	return ret;
 }
 
-static int mips_ejtag_fdc_tty_cpu_down(struct mips_cdmm_device *dev)
+int mips_ejtag_fdc_tty_cpu_down(struct mips_cdmm_device *dev)
 {
 	struct mips_ejtag_fdc_tty *priv = mips_cdmm_get_drvdata(dev);
 	unsigned int cfg;
@@ -1032,7 +1032,7 @@ static int mips_ejtag_fdc_tty_cpu_down(struct mips_cdmm_device *dev)
 	return 0;
 }
 
-static int mips_ejtag_fdc_tty_cpu_up(struct mips_cdmm_device *dev)
+int mips_ejtag_fdc_tty_cpu_up(struct mips_cdmm_device *dev)
 {
 	struct mips_ejtag_fdc_tty *priv = mips_cdmm_get_drvdata(dev);
 	unsigned int cfg;
@@ -1069,22 +1069,6 @@ static int mips_ejtag_fdc_tty_cpu_up(struct mips_cdmm_device *dev)
 out:
 	return ret;
 }
-
-static const struct mips_cdmm_device_id mips_ejtag_fdc_tty_ids[] = {
-	{ .type = 0xfd },
-	{ }
-};
-
-static struct mips_cdmm_driver mips_ejtag_fdc_tty_driver = {
-	.drv		= {
-		.name	= "mips_ejtag_fdc",
-	},
-	.probe		= mips_ejtag_fdc_tty_probe,
-	.cpu_down	= mips_ejtag_fdc_tty_cpu_down,
-	.cpu_up		= mips_ejtag_fdc_tty_cpu_up,
-	.id_table	= mips_ejtag_fdc_tty_ids,
-};
-builtin_mips_cdmm_driver(mips_ejtag_fdc_tty_driver);
 
 static int __init mips_ejtag_fdc_init_console(void)
 {
@@ -1130,7 +1114,7 @@ static void __iomem *kgdbfdc_setup(void)
 	regs = mips_ejtag_fdc_con.regs[cpu];
 	/* First console output on this CPU? */
 	if (!regs) {
-		regs = mips_cdmm_early_probe(0xfd);
+		regs = get_fdc_regs();
 		mips_ejtag_fdc_con.regs[cpu] = regs;
 	}
 	/* Already tried and failed to find FDC on this CPU? */
