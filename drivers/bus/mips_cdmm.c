@@ -415,6 +415,7 @@ static int mips_cdmm_setup(struct mips_cdmm_bus *bus)
 	/* Already complained? */
 	if (bus->phys == 1) {
 		ret = -ENOMEM;
+		bus->phys = 0; // ACA: vratio sam na 0 da bi opet pokusao
 		goto out;
 	}
 	/* Record our success for other CPUs to copy */
