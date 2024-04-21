@@ -276,7 +276,7 @@ static void mips_ejtag_fdc_console_write(struct console *c, const char *s,
 	const u8 *buf_ptr = buf;
 	/* Number of bytes of input data encoded up to each byte in buf */
 	u8 inc[4];
-
+printk(KERN_INFO "Ovaj bufer ce se enkodirati i ide na FDC: %s\n", s);
 	local_irq_save(flags);
 	cpu = smp_processor_id();
 	regs = cons->regs[cpu];
@@ -766,7 +766,7 @@ static ssize_t mips_ejtag_fdc_tty_write(struct tty_struct *tty, const u8 *buf,
 	int count, block;
 	struct mips_ejtag_fdc_tty_port *dport = tty->driver_data;
 	struct mips_ejtag_fdc_tty *priv = dport->driver;
-
+printk(KERN_INFO "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA sad cu da pisem %ld bajtova\n", total);
 	/*
 	 * Write to output buffer.
 	 *
@@ -809,6 +809,7 @@ static unsigned int mips_ejtag_fdc_tty_write_room(struct tty_struct *tty)
 	struct mips_ejtag_fdc_tty_port *dport = tty->driver_data;
 	struct mips_ejtag_fdc_tty *priv = dport->driver;
 	unsigned int room;
+printk(KERN_INFO "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA sad cu da pisem rooom\n");
 
 	/* Report the space in the xmit buffer */
 	spin_lock(&dport->xmit_lock);
@@ -828,6 +829,7 @@ static unsigned int mips_ejtag_fdc_tty_chars_in_buffer(struct tty_struct *tty)
 	chars = dport->xmit_cnt;
 	spin_unlock(&dport->xmit_lock);
 
+printk(KERN_INFO "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA mips_ejtag_fdc_tty_chars_in_buffer = %d bajtova\n", chars);
 	return chars;
 }
 
